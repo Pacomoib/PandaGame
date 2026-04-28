@@ -4,12 +4,11 @@ from M5L3PyPro_Hero import Hero
 
 
 class Game(ShowBase):
-   def __init__(self):
-       ShowBase.__init__(self)
-       self.land = Mapmanager()
-       x,y = self.land.loadLand("land.txt")
-       self.hero = Hero((x//2,y//2,2),self.land)
-       base.camLens.setFov(90)
+    def __init__(self):
+        ShowBase.__init__(self)
+        self.land = Mapmanager()
+        self.land.loadLand("land.txt")
+        base.camLens.setFov(90)
 
 
 game = Game()

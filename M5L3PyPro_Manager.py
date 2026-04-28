@@ -1,3 +1,4 @@
+import pickle
 class Mapmanager():
     def __init__(self):
         self.model = 'block' # el modelo del cubo está en el archivo block.egg
@@ -56,3 +57,79 @@ class Mapmanager():
                     x += 1
                 y += 1
         return x,y
+    
+    def findBlocks(self,pos):
+        return self.land.findAllMatches("=at="+str(pos))
+    
+    
+    def isEmpty(self,pos):
+        blocks = self.findBlocks(pos)
+        if blocks:
+            return False
+        else: 
+            return True
+        
+    def findHighestEmpty(self,pos):
+        x,y,z = pos
+        z = 1
+        while not self.isEmpty((x,y,x)): 
+            z +=1
+        return (x,y,z)
+    
+    def buildBlock(self,pos):
+        x,y,z = pos
+        new = self.findHighestEmpty(pos)
+        if new[2] <= z+1:
+            self.addBlock(new)
+    
+    def delBlock(self,position):
+        blocks = self.findBlocks(position)
+        for block in blocks:
+            block.removeNode()
+    
+    def delBlockFrom(self,position):
+        x,y,z = self.findHighestEmpty(position)
+        pos = x,y,z-1
+        for block in self.findBlocks(pos):
+            block.removeNode()
+    def saveMap(self):
+        """guarda todos los bloques, incluyendo estructuras, a un archivo binario"""
+
+
+        """devuelve una colección NodePath para todos los bloques existentes en el mapa del mundo"""
+        blocks = self.land.getChildren()
+        # abre un archivo binario para grabar
+        with open('my_map.dat', 'wb') as fout:
+
+
+            # guarda la cantidad de bloques al principio del archivo
+            pickle.dump(len(blocks), fout)
+
+
+            # recorre todos los bloques
+            for block in blocks:
+                # guarda la posición
+                x, y, z = block.getPos()
+                pos = (int(x), int(y), int(z))
+                pickle.dump(pos, fout)
+
+
+    def loadMap(self):
+        # elimina todos los bloques
+        self.clear()
+
+
+        # abre un archivo binario para su lectura
+        with open('my_map.dat', 'rb') as fin:
+            
+            # lee la cantidad de bloques
+            length = pickle.load(fin)
+
+
+            for i in range(length):
+                # lee la posición
+                pos = pickle.load(fin)
+
+
+                # crea un nuevo bloque
+                self.addBlock(pos)
